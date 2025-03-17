@@ -1,0 +1,36 @@
+# Python files
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Local settings and secrets
+.env
+*.env
+
+# SQLite databse
+db.sqlite3
+
+# Migrations
+*/migrations/*.pyc
+*/migrations/*.pyo
+*/migrations/__pycache__/
+!*/migrations/__init__.py
+
+# Static files
+staticfiles/
+media/
+
+# Jupyter Notebooks & Logs
+*.ipynb_checkpoints
+logs/
+*.log
+
+# Local dependencies
+venv/
+env/
+*.egg-info/
+.Python
+
+# Temporary files
+.DS_Store
+Thumbs.db
