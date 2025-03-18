@@ -48,6 +48,11 @@ class Treatment(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     description = models.TextField()
     date_prescribed = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=[("Pending", "Pending"), ("Completed", "Completed")],
+        default="Pending"
+    )
 
     def __str__(self):
         return f"Treatment for {self.patient.name} by {self.doctor.user.get_full_name()}"

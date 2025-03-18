@@ -5,19 +5,29 @@ from .models import User, Doctor, Patient, Assistant, Treatment
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "email", "role"]
+        fields = ["id", "username", "email", "password", "role"]
+        extra_kwargs = {"password": {"write_only": True}}
 
+    def create(self, validated_data):
+        role = validated_data.pop("role", "DR")
+        user = User.objects.create_user(**validated_data)
+        user.role = role
+        user.save()
+        return user
+
+    
 
 class DoctorSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
         model = Doctor
         fields = ["id", "user", "specialty"]
 
 
+
 class PatientSerializer(serializers.ModelSerializer):
-    doctor = DoctorSerializer(read_only=True)
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all())
 
     class Meta:
         model = Patient
@@ -25,8 +35,10 @@ class PatientSerializer(serializers.ModelSerializer):
 
 
 class AssistantSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    assigned_patients = PatientSerializer(many=True, read_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    assigned_patients = serializers.PrimaryKeyRelatedField(
+        queryset=Patient.objects.all(), many=True, required=False
+    )
 
     class Meta:
         model = Assistant
@@ -34,9 +46,9 @@ class AssistantSerializer(serializers.ModelSerializer):
 
 
 class TreatmentSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
-    doctor = DoctorSerializer(read_only=True)
+    patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all())
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all())
 
     class Meta:
         model = Treatment
-        fields = ["id", "patient", "doctor", "description", "date_prescribed"]
+        fields = ["id", "patient", "doctor", "description", "date_prescribed", "status"]
